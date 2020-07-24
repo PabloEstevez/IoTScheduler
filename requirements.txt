@@ -3,3 +3,6 @@ argparse
 os
 sys
 pwd
+pyTelegramBotAPI
+json
+gpiozero
