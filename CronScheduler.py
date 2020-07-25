@@ -13,7 +13,7 @@ cron = CronTab(user=username)
 
 ## FUNCTIONS ##
 
-def set_task(command_init, command_final, inicio, comentario, duracion, ott):
+def set_task(command_init, command_final, inicio, duracion, comentario, ott):
 
     m = h = dom = mon = dow = "*"
 
