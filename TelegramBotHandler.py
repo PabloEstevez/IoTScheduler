@@ -56,9 +56,6 @@ def devices2str():
         formated += "→ " + i + ": " + config["devices"][i]["description"] + "\n"
     return formated
 
-
-
-
 def input_schedule(message):
     global inicio 
     inicio = message.text
@@ -100,7 +97,6 @@ def handle_schedule(message):
 def handle_start(message):
     global device
     text = message.text.split(" ")
-    print(text)
     if len(text) > 1:
         device = text[1]
     if check_device(device):
@@ -116,6 +112,16 @@ def handle_tasks(message):
 @bot.message_handler(commands=['devices', 'dispositivos'])
 def handle_devices(message):
     bot.send_message(message.from_user.id, devices2str)
+
+@bot.message_handler(commands=['remove', 'delete', 'borra', 'elimina'])
+def handle_remove(message):
+    text = message.text.split(" ")
+    if len(text) < 2:
+        bot.send_message(message.from_user.id, get_tasks())
+    else:
+        id = text[1]
+        CronScheduler.remove_task(id)
+        bot.send_message(message.from_user.id, get_tasks())
 
 @bot.message_handler(func=lambda m: True)
 def echo_all(message):

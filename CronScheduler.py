@@ -29,7 +29,10 @@ def set_task(command_init, command_final, inicio, duracion, comentario, ott):
         comentario = input("Comentario: ")
 
     h = int(inicio.split(" ")[0].split(":")[0])
-    m = int(inicio.split(" ")[0].split(":")[1])
+    if len(inicio.split(" ")[0].split(":")) > 1:
+        m = int(inicio.split(" ")[0].split(":")[1])
+    else:
+        m = 0
 
     # Day of the month and month are optional
     try:
