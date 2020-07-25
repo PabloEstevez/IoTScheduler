@@ -50,6 +50,15 @@ def get_tasks():
             formated += " - " + task[1] + ":" + task[0] + "\n"
     return formated
 
+def devices2str():
+    formated = "DISPOSITIVOS:\n"
+    for i in config["devices"]:
+        formated += "→ " + i + ": " + config["devices"][i]["description"] + "\n"
+    return formated
+
+
+
+
 def input_schedule(message):
     global inicio 
     inicio = message.text
@@ -79,14 +88,13 @@ def schedule():
 def handle_schedule(message):
     global device
     text = message.text.split(" ")
-    print(text)
     if len(text) > 1:
         device = text[1]
     if check_device(device):
         sent = bot.send_message(message.from_user.id, "Dime la hora de inicio")
         bot.register_next_step_handler(sent, input_schedule)
     else:
-        bot.send_message(message.from_user.id, "Los dispositivos disponibles son: " + str(get_devices()))
+        bot.send_message(message.from_user.id, devices2str())
 
 @bot.message_handler(commands=['start','enciende'])
 def handle_start(message):
@@ -104,6 +112,10 @@ def handle_start(message):
 @bot.message_handler(commands=['tasks', 'tareas'])
 def handle_tasks(message):
     bot.send_message(message.from_user.id, get_tasks())
+
+@bot.message_handler(commands=['devices', 'dispositivos'])
+def handle_devices(message):
+    bot.send_message(message.from_user.id, devices2str)
 
 @bot.message_handler(func=lambda m: True)
 def echo_all(message):
