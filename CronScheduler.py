@@ -13,8 +13,12 @@ cron = CronTab(user=username)
 
 ## FUNCTIONS ##
 
-def set_task(command_init, command_final, inicio, duracion, comentario, ott):
+def refresh_cron():
+    global cron
+    cron = CronTab(user=username)
 
+def set_task(command_init, command_final, inicio, duracion, comentario, ott):
+    refresh_cron()
     m = h = dom = mon = dow = "*"
 
     if command_init==None:
@@ -49,7 +53,7 @@ def set_task(command_init, command_final, inicio, duracion, comentario, ott):
     m = (m + duracion) % 60
 
     if ott == True:
-        command_final += " && python " + os.getcwd() + "/" + __file__ + " --delete " + comentario
+        command_final += " ; python " + __file__ + " --delete " + comentario
     job = cron.new(command=command_final, comment=comentario+"_Final")
     job.setall(m,h,dom,mon,dow)
 
@@ -57,6 +61,7 @@ def set_task(command_init, command_final, inicio, duracion, comentario, ott):
 
 
 def remove_task(id):
+    refresh_cron()
     cron.remove_all(comment=id+"_Inicio")
     cron.remove_all(comment=id+"_Final")
 
@@ -64,6 +69,7 @@ def remove_task(id):
 
 
 def get_tasks():
+    refresh_cron()
     jobs = []
     for job in cron:
         jobs.append(str(job))

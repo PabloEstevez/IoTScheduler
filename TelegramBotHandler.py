@@ -3,6 +3,7 @@ import json
 import CronScheduler
 import DeviceController
 import os
+import datetime
 
 ## CONFIGURATION ##
 config_file = open("config.json", "r")
@@ -69,14 +70,22 @@ def input_duration(message):
 def input_comment(message):
     global comentario
     comentario = message.text
-    schedule()
+    sent = bot.send_message(message.from_user.id, "¿Quieres que funcione una sola vez?")
+    bot.register_next_step_handler(sent, input_ott)
+def input_ott(message):
+    if message.text.upper() == "YES" or message.text.upper() == "SI":
+        ott = True
+    else:
+        ott = False
+    schedule(ott)
     bot.send_message(message.from_user.id, "Listo!")
 
-def schedule():
-    global device
+def schedule(ott):
+    global inicio, duracion, comentario, device
     command_init = "python " + os.getcwd() + "/DeviceController.py --id " + device + " --status on"
     command_final = "python " + os.getcwd() + "/DeviceController.py --id " + device + " --status off"
-    CronScheduler.set_task(command_init, command_final, inicio, duracion, comentario, False)
+    CronScheduler.set_task(command_init, command_final, inicio, duracion, comentario, ott)
+    inicio = duracion = comentario = device = None 
 ###
 
 
@@ -100,14 +109,43 @@ def handle_start(message):
     if len(text) > 1:
         device = text[1]
     if check_device(device):
-        sent = bot.send_message(message.from_user.id, "Dime la hora de inicio")
-        bot.register_next_step_handler(sent, input_schedule)
+        DeviceController.on_off(device, True)
+        bot.send_message(message.from_user.id, "El dispositivo " + device + " se ha encendido")
     else:
-        bot.send_message(message.from_user.id, "Los dispositivos disponibles son: " + str(get_devices()))
+        bot.send_message(message.from_user.id, devices2str)
+
+@bot.message_handler(commands=['stop','apaga'])
+def handle_stop(message):
+    global device
+    text = message.text.split(" ")
+    if len(text) > 1:
+        device = text[1]
+    if check_device(device):
+        DeviceController.on_off(device, False)
+        bot.send_message(message.from_user.id, "El dispositivo " + device + " se ha apagado")
+    else:
+        bot.send_message(message.from_user.id, devices2str)
 
 @bot.message_handler(commands=['tasks', 'tareas'])
 def handle_tasks(message):
     bot.send_message(message.from_user.id, get_tasks())
+
+@bot.message_handler(commands=['ott'])
+def handle_ott(message):
+    global device, duracion, inicio, comentario
+    text = message.text.split(" ")
+    if len(text) > 3:
+        device = text[1]
+        duracion = int(text[2])
+        comentario = text[3]
+    if check_device(device):
+        time = datetime.datetime.now()
+        inicio = str(time.hour) + ":" + str(time.minute)
+        DeviceController.on_off(device, True)
+        bot.send_message(message.from_user.id, "El dispositivo " + device + " se ha encendido y se apagará dentro de " + str(duracion) + " minutos")
+        schedule(True)
+    else:
+        bot.send_message(message.from_user.id, helpMessage)
 
 @bot.message_handler(commands=['devices', 'dispositivos'])
 def handle_devices(message):
@@ -130,4 +168,7 @@ def echo_all(message):
 
 
 print("Bot listening...")
-bot.polling()
+try:
+    bot.polling()
+except:
+    bot.send_message(config["telegram_bot"]["my_id"], "The bot crashed :(")
