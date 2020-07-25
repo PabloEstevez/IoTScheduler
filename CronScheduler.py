@@ -60,21 +60,28 @@ def remove_task(id):
     cron.write()
 
 
+def get_tasks():
+    jobs = []
+    for job in cron:
+        jobs.append(str(job))
+    return jobs
+
 ## MAIN ##
 
 def main():
     parser = argparse.ArgumentParser(description="Basic automated job scheduler using Python.")
     parser.add_argument("--delete", help="ID of the task to delete.")
-    parser.add_argument("--ott", help="OTT=[true/false] One Time Task.")
+    parser.add_argument("--ott", dest="ott", action="store_true", help="One Time Task.")
+    parser.add_argument("--get_tasks", dest="get_tasks", action="store_true", help="One Time Task.")
+    parser.set_defaults(ott=False, get_tasks=None)
     args = parser.parse_args()
     if args.delete != None:
         remove_task(args.delete)
-    elif args.ott != None:
-        if args.ott == "true":
-            set_task(None,None,None,None,None, True)
+    elif args.get_tasks != None:
+        get_tasks()
     else:
-        set_task(None,None,None,None,None, False)
-
+        set_task(None,None,None,None,None, args.ott)
+    
 
 if __name__ == "__main__":
     main()

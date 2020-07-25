@@ -33,8 +33,8 @@ def on_off(id, status):
 
 def main():
     parser = argparse.ArgumentParser(description="IoTScheduler hardware controller.")
-    parser.add_argument("--id", help="ID of the device to controll.")
-    parser.add_argument("--status", help="STATUS=[on/off] Set the device on/off.")
+    parser.add_argument("--id", help="ID of the device to controll.", required=True)
+    parser.add_argument("--status", help="STATUS=[on/off] Set the device on/off.", required=True)
     args = parser.parse_args()
     on_off(args.id, args.status)
 

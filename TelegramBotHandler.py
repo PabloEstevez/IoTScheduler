@@ -35,6 +35,21 @@ def get_devices():
         dev.append(i)
     return dev
 
+def get_tasks():
+    tasks = CronScheduler.get_tasks()
+    formated = "TAREAS:\n"
+    for i in range(len(tasks)):
+        job = tasks[i].split("#")
+        if len(job) < 2:
+            break
+        task = job[0].split(" ")
+        comment = job[1]
+        if "_Inicio" in comment:
+            formated += "→ " + comment.replace("_Inicio","") + ": " + task[1] + ":" + task[0] 
+        elif "_Final" in comment:
+            formated += " - " + task[1] + ":" + task[0] + "\n"
+    return formated
+
 def input_schedule(message):
     global inicio 
     inicio = message.text
@@ -86,6 +101,9 @@ def handle_start(message):
     else:
         bot.send_message(message.from_user.id, "Los dispositivos disponibles son: " + str(get_devices()))
 
+@bot.message_handler(commands=['tasks', 'tareas'])
+def handle_tasks(message):
+    bot.send_message(message.from_user.id, get_tasks())
 
 @bot.message_handler(func=lambda m: True)
 def echo_all(message):
