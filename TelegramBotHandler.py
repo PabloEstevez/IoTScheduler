@@ -17,12 +17,19 @@ config_file.close()
 bot = telebot.TeleBot(config["telegram_bot"]["token"])
 helpMessage = """
 /ayuda: Muestra esta ayuda.
+
 /tareas: Muestra las tareas activas
+
 /dispositivos: Muestra los dispositivos disponibles.
+
 /enciende: Enciende un dispositivo de forma indefinida. Sintaxis: /enciende dispositivo.
+
 /apaga: Apaga un dispositivo. Sintaxis: /apaga dispositivo
+
 /programa: Programa un dispositivo. Sintaxis: /programa dispositivo
+
 /ott: Enciende un dispositivo una sola vez por un periodo de tiempo concreto. Cuando pasa dicho tiempo, se elimina la tarea. Sintaxis: /ott dispositivo tiempo(min) Comentario.
+
 /borra: Elimina una tarea de la lista. Sintaxis: /borra tarea.
 """
 inicio = duracion = comentario = device = None 
