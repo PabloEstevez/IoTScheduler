@@ -51,7 +51,6 @@ def main():
     on_off(args.id, args.status)
 
 if __name__ == "__main__":
-    global use_mqtt
     use_mqtt = True
     main()
 
