@@ -53,7 +53,7 @@ def set_task(command_init, command_final, inicio, duracion, comentario, ott):
     m = (m + duracion) % 60
 
     if ott == True:
-        command_final += " ; python " + __file__ + " --delete " + comentario
+        command_final += " ; python3 " + __file__ + " --delete " + comentario
     job = cron.new(command=command_final, comment=comentario+"_Final")
     job.setall(m,h,dom,mon,dow)
 

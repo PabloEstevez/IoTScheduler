@@ -1,4 +1,4 @@
-from gpiozero import LED
+import RPi.GPIO as gpio
 import json
 import argparse
 import os
@@ -17,12 +17,14 @@ use_mqtt = False
 
 def on_off(id, status):
     if config["devices"][id]["type"] == "gpio":
-        #led = LED(config["devices"][id]["pin"])
+        gpio.setwarnings(False)
+        gpio.setmode(gpio.BCM)
+        gpio.setup(config["devices"][id]["pin"], gpio.OUT)
         if status == "true":
-            #led.on()
+            gpio.output(config["devices"][id]["pin"],True)
             pass
         else:
-            #led.off()
+            gpio.output(config["devices"][id]["pin"],False)
             pass
         print(status)
     elif config["devices"][id]["type"] == "i2c":

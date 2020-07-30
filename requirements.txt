@@ -1,6 +1,6 @@
 python-crontab
 argparse
 pyTelegramBotAPI
-gpiozero
 datetime
 paho-mqtt
+RPi.GPIO
