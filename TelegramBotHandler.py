@@ -6,6 +6,7 @@ import os
 import datetime
 
 ## CONFIGURATION ##
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 config_file = open("config.json", "r")
 config_str = config_file.read()
 config = json.loads(config_str)
