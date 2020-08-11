@@ -10,7 +10,6 @@ config_file = open("config.json", "r")
 config_str = config_file.read()
 config = json.loads(config_str)
 config_file.close()
-use_mqtt = False
 ###
 
 ## FUNCTIONS ##
@@ -18,7 +17,7 @@ use_mqtt = False
 def on_off(id, status):
     if config["devices"][id]["type"] == "gpio":
         gpio_setup(id)
-        if status == "true":
+        if status == "1":
             gpio.output(config["devices"][id]["pin"],True)
             pass
         else:
@@ -28,7 +27,7 @@ def on_off(id, status):
     elif config["devices"][id]["type"] == "i2c":
         print("I2C activated!")
 
-    if use_mqtt:
+    if args.mqtt:
         client = mqtt.Client()
         client.connect(config["mqtt"]["server"], config["mqtt"]["port"], config["mqtt"]["keepalive"])
         client.publish(id, status)
@@ -57,11 +56,12 @@ def gpio_setup(id):
 def main():
     parser = argparse.ArgumentParser(description="IoTScheduler hardware controller.")
     parser.add_argument("--id", help="ID of the device to controll.", required=True)
-    parser.add_argument("--set", help="SET=[true/false] Set the device on/off.", required=False)
-    parser.add_argument("--status", dest="status", action="store_true", help="ID of the device to controll.", required=False)
+    parser.add_argument("--set", help="SET=[1/0] Set the device on/off.", required=False)
+    parser.add_argument("--status", dest="status", action="store_true", help="Print status of the device.", required=False)
+    parser.add_argument("--mqtt", dest="mqtt", action="store_true", help="Notify status via MQTT.", required=False)
+    parser.set_defaults(status=False, mqtt=False)
+    global args
     args = parser.parse_args()
-    global use_mqtt
-    use_mqtt = True
     if args.set != None:
         on_off(args.id, args.set)
     if args.status:
