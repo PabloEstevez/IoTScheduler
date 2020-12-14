@@ -2,6 +2,7 @@ import RPi.GPIO as gpio
 import json
 import argparse
 import os
+import time
 import paho.mqtt.client as mqtt
 
 ## CONFIGURATION ##
@@ -17,12 +18,24 @@ config_file.close()
 def on_off(id, status):
     if config["devices"][id]["type"] == "gpio":
         gpio_setup(id)
-        if status == "1":
-            gpio.output(config["devices"][id]["pin"],True)
-            pass
-        else:
-            gpio.output(config["devices"][id]["pin"],False)
-            pass
+        if id == "motor":
+            if status == "1":
+                gpio.output(config["devices"]["motor"]["pin"],True)
+            else:
+                gpio.output(config["devices"]["motor"]["pin"],False)
+        elif config["devices"][id]["motor"] == 1:
+            if status == "1":
+                gpio.output(config["devices"][id]["pin"],True)
+                time.sleep(1)
+                gpio_setup("motor")
+                gpio.output(config["devices"]["motor"]["pin"],True)
+            else:
+                if not check_using("motor", id):
+                    gpio_setup("motor")
+                    gpio.output(config["devices"]["motor"]["pin"],False)
+                    time.sleep(5)
+                gpio_setup(id)
+                gpio.output(config["devices"][id]["pin"],False)
         gpio_status(id)
     elif config["devices"][id]["type"] == "i2c":
         print("I2C activated!")
@@ -42,6 +55,16 @@ def gpio_setup(id):
     gpio.setwarnings(False)
     gpio.setmode(gpio.BCM)
     gpio.setup(config["devices"][id]["pin"], gpio.OUT)
+
+def check_using(id, exception):
+    for device in config["devices"]:
+        if (device != id) and (device != exception) and (config["devices"][device][id] == 1):
+            gpio_setup(device)
+            if gpio.input(config["devices"][device]["pin"]) == 1:
+                return True
+    return False
+
+
 ###
 
 
