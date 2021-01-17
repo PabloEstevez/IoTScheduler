@@ -41,12 +41,12 @@ def set_task_API():
     if request.method == "POST":
         #FROM BODY
         #print(request.form.getlist)
-        command_init_API = request.form['command_init']
-        command_final_API = request.form['command_final']
-        inicio_API = request.form['inicio']
-        duracion_API = request.form['duracion']
-        comentario_API = request.form['comentario']
-        ott_API = bool(request.form['ott'])
+        command_init_API = request.json['command_init']
+        command_final_API = request.json['command_final']
+        inicio_API = request.json['inicio']
+        duracion_API = request.json['duracion']
+        comentario_API = request.json['comentario']
+        ott_API = bool(request.json['ott'])
         #EXECUTE PYTHON COMMAND
         set_task(command_init_API, command_final_API, inicio_API, duracion_API, comentario_API, ott_API)
         #RETURN THE INPUT
