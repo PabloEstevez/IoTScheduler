@@ -4,3 +4,5 @@ pyTelegramBotAPI
 datetime
 paho-mqtt
 RPi.GPIO
+Flask
+flask-cors

@@ -1,0 +1,54 @@
+{
+    "telegram_bot": {
+        "token": "1396328782:AAEINAIU-6V_K0Ab1PE7e7dtoFugrExeiJU",
+        "my_id": 397915414
+    },
+    "mqtt": {
+        "server": "localhost",
+        "port": 1883,
+        "keepalive": 60
+    },
+    "devices": {
+        "motor": {
+            "description": "Motor y electrovalvula principales.",
+            "type": "gpio",
+            "pin": 5
+        },
+        "aspersores": {
+            "description": "Electrovalvula que controla el huerto.",
+            "type": "gpio",
+            "pin": 6,
+            "motor": 1
+        },
+	"bancal1": {
+            "description": "Electrovalvula que controla el huerto.",
+            "type": "gpio",
+            "pin": 6,
+            "motor": 1
+        },
+	"bancal2": {
+            "description": "Electrovalvula que controla el huerto.",
+            "type": "gpio",
+            "pin": 6,
+            "motor": 1
+        },
+	"bancal3W": {
+            "description": "Electrovalvula que controla el huerto.",
+            "type": "gpio",
+            "pin": 6,
+            "motor": 1
+        },
+	"bancal3E": {
+            "description": "Electrovalvula que controla el huerto.",
+            "type": "gpio",
+            "pin": 6,
+            "motor": 1
+        },
+	"huerto": {
+            "description": "Electrovalvula que controla el huerto.",
+            "type": "gpio",
+            "pin": 6,
+            "motor": 1
+        }
+    }
+}

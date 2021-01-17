@@ -3,7 +3,8 @@ import json
 import argparse
 import os
 import time
-import paho.mqtt.client as mqtt
+#import paho.mqtt.client as mqtt
+import paho.mqtt.publish as mqtt_pub
 
 ## CONFIGURATION ##
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -16,6 +17,7 @@ config_file.close()
 ## FUNCTIONS ##
 
 def on_off(id, status):
+    #print("Status: " + status)
     if config["devices"][id]["type"] == "gpio":
         gpio_setup(id)
         if id == "motor":
@@ -26,29 +28,35 @@ def on_off(id, status):
         elif config["devices"][id]["motor"] == 1:
             if status == "1":
                 gpio.output(config["devices"][id]["pin"],True)
-                time.sleep(1)
+                #time.sleep(0.2)
                 gpio_setup("motor")
                 gpio.output(config["devices"]["motor"]["pin"],True)
             else:
                 if not check_using("motor", id):
                     gpio_setup("motor")
                     gpio.output(config["devices"]["motor"]["pin"],False)
-                    time.sleep(5)
+                    time.sleep(5) # To let the solenoid valve drain the remaining pressure
                 gpio_setup(id)
                 gpio.output(config["devices"][id]["pin"],False)
         gpio_status(id)
     elif config["devices"][id]["type"] == "i2c":
         print("I2C activated!")
-
-    if args.mqtt:
-        client = mqtt.Client()
-        client.connect(config["mqtt"]["server"], config["mqtt"]["port"], config["mqtt"]["keepalive"])
-        client.publish(id, status)
+    
+    try:
+        if args.mqtt:
+            #client = mqtt.Client()
+            #client.connect(config["mqtt"]["server"], config["mqtt"]["port"], config["mqtt"]["keepalive"])
+            #client.publish(id, status)
+            mqtt_pub.single(id, status, retain=True, hostname=config["mqtt"]["server"], port=config["mqtt"]["port"], keepalive=config["mqtt"]["keepalive"])
+    except: pass
+    return(status)
 
 
 def gpio_status(id):
     gpio_setup(id)
-    print(gpio.input(config["devices"][id]["pin"]), end='')
+    status = gpio.input(config["devices"][id]["pin"])
+    print(status, end='')
+    return status
 
 
 def gpio_setup(id):
@@ -64,12 +72,8 @@ def check_using(id, exception):
                 return True
     return False
 
-
-###
-
-
-## DEFINITIONS ##
-
+def get_devices():
+    return config["devices"]
 
 ###
 
