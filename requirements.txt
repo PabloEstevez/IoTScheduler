@@ -1,0 +1,8 @@
+python-crontab
+argparse
+pyTelegramBotAPI
+datetime
+paho-mqtt
+RPi.GPIO
+Flask
+flask-cors
