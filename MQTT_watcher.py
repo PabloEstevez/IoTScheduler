@@ -1,5 +1,14 @@
 from DeviceController import on_off,get_devices
 import paho.mqtt.client as mqtt
+import json
+
+## CONFIGURATION ##
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+config_file = open("config.json", "r")
+config_str = config_file.read()
+config = json.loads(config_str)
+config_file.close()
+###
 
 def callback_controller(client, userdata, message):
     print("%s %s" % (message.topic, message.payload.decode("utf-8")))
@@ -14,7 +23,7 @@ for device in get_devices():
     MQTT_TOPICS.append((device,0))
 
 # Connec to MQTT Server and Subscribe to device topics
-mqttc.connect("riego.local", 1883, 60)
+mqttc.connect(config["mqtt"]["server"], config["mqtt"]["port"], config["mqtt"]["keepalive"])
 mqttc.subscribe(MQTT_TOPICS)
 
 mqttc.loop_forever()
