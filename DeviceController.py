@@ -8,6 +8,7 @@ import logging
 import paho.mqtt.publish as mqtt_pub
 from datetime import datetime
 
+
 ## CONFIGURATION ##
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 config_file = open("config.json", "r")
@@ -97,4 +98,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
 
