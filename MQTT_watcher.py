@@ -1,6 +1,6 @@
 from DeviceController import on_off,get_devices
 import paho.mqtt.client as mqtt
-import json
+import json,os
 
 ## CONFIGURATION ##
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -19,8 +19,9 @@ mqttc = mqtt.Client()
 # Add message callbacks that will only trigger on a specific subscription match.
 MQTT_TOPICS=[]
 for device in get_devices():
-    mqttc.message_callback_add(device, callback_controller)
-    MQTT_TOPICS.append((device,0))
+    if device != "motor":
+        mqttc.message_callback_add(device, callback_controller)
+        MQTT_TOPICS.append((device,0))
 
 # Connec to MQTT Server and Subscribe to device topics
 mqttc.connect(config["mqtt"]["server"], config["mqtt"]["port"], config["mqtt"]["keepalive"])

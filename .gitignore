@@ -1,0 +1,6 @@
+__pycache__
+config.json
+*.log
+*.pcap
+*.old
+*.backup

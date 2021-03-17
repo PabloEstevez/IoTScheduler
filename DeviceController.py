@@ -3,8 +3,10 @@ import json
 import argparse
 import os
 import time
+import logging
 #import paho.mqtt.client as mqtt
 import paho.mqtt.publish as mqtt_pub
+from datetime import datetime
 
 ## CONFIGURATION ##
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -12,9 +14,10 @@ config_file = open("config.json", "r")
 config_str = config_file.read()
 config = json.loads(config_str)
 config_file.close()
+logging.basicConfig( level=logging.DEBUG, filename='mqtt_watcher.log')
 ###
 
-## FUNCTIONS ##
+## METHODS ##
 
 def on_off(id, status):
     #print("Status: " + status)
@@ -39,31 +42,28 @@ def on_off(id, status):
                 gpio_setup(id)
                 gpio.output(config["devices"][id]["pin"],False)
         gpio_status(id)
-    elif config["devices"][id]["type"] == "i2c":
-        print("I2C activated!")
-    
-    try:
-        if args.mqtt:
-            #client = mqtt.Client()
-            #client.connect(config["mqtt"]["server"], config["mqtt"]["port"], config["mqtt"]["keepalive"])
-            #client.publish(id, status)
-            mqtt_pub.single(id, status, retain=True, hostname=config["mqtt"]["server"], port=config["mqtt"]["port"], keepalive=config["mqtt"]["keepalive"])
-    except: pass
+#    elif config["devices"][id]["type"] == "i2c":
+#        print("I2C activated!")
+    if config["mqtt"]:
+        mqtt_pub.single(id+"_status", status, hostname=config["mqtt"]["server"], port=config["mqtt"]["port"], keepalive=config["mqtt"]["keepalive"])
+    # [TODO] Log to file instead of print
+    print(datetime.now().strftime("%d/%m/%Y %H:%M:%S") + " → " + id + ": " + str(status))
     return(status)
 
-
+# Check the status of a device
 def gpio_status(id):
     gpio_setup(id)
     status = gpio.input(config["devices"][id]["pin"])
     print(status, end='')
     return status
 
-
+# Set GPIO pin as output
 def gpio_setup(id):
     gpio.setwarnings(False)
     gpio.setmode(gpio.BCM)
     gpio.setup(config["devices"][id]["pin"], gpio.OUT)
 
+# Checks if a device is being used by measuring the GPIO output pin.
 def check_using(id, exception):
     for device in config["devices"]:
         if (device != id) and (device != exception) and (config["devices"][device][id] == 1):
@@ -72,6 +72,7 @@ def check_using(id, exception):
                 return True
     return False
 
+# Gest a list of devices
 def get_devices():
     return config["devices"]
 
@@ -79,7 +80,7 @@ def get_devices():
 
 
 ## MAIN ##
-
+# Only executed if this file is executed from command line
 def main():
     parser = argparse.ArgumentParser(description="IoTScheduler hardware controller.")
     parser.add_argument("--id", help="ID of the device to controll.", required=True)
