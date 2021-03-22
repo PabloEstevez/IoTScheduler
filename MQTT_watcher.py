@@ -1,6 +1,6 @@
 from DeviceController import on_off,get_devices
 import paho.mqtt.client as mqtt
-import json,os
+import json,os, time
 
 ## CONFIGURATION ##
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -24,8 +24,14 @@ for device in get_devices():
         MQTT_TOPICS.append((device,0))
 
 # Connec to MQTT Server and Subscribe to device topics
-mqttc.connect(config["mqtt"]["server"], config["mqtt"]["port"], config["mqtt"]["keepalive"])
-mqttc.subscribe(MQTT_TOPICS)
-
-mqttc.loop_forever()
+check = True
+while check:
+    try:
+        mqttc.connect(config["mqtt"]["server"], config["mqtt"]["port"], config["mqtt"]["keepalive"])
+        mqttc.subscribe(MQTT_TOPICS)
+        mqttc.loop_forever()
+        check=False
+    except:
+        print("Unable to connect to MQTT broker, retrying...")
+        time.sleep(1)
 
